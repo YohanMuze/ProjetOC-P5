@@ -52,48 +52,57 @@ function switchSlide(currentSlide) { //used to switch between slides - image + t
 	baliseText.innerHTML = `${currentSlide.tagLine}`;
 }
 
-function cloneDotNext() { //add dot after the dot_selected and remove first dot
+function cloneDot(positionClone) { //add dot - argument expected is 'afterbegin' or 'beforeend'
 	let clone = dot.cloneNode(true);
-	dots.insertAdjacentElement('beforeend', clone);
-	dots.firstChild.remove();
+	dots.insertAdjacentElement(positionClone, clone);
 }
 
-function cloneDotPrev() { //add dot before dot_selected and remove last dot
-	let clone = dot.cloneNode(true);
-	dots.insertAdjacentElement('afterbegin', clone);
-	dots.lastChild.remove();
+function removeDot (position) {
+	if (position === 'firstChild') {
+		dots.firstChild.remove();
+	} else if (position === 'lastChild') {
+		dots.lastChild.remove();
+	}
 }
 
+function switchComplete(direction) {
+	if (slideNumber === 0 && direction === 'left'){
+			slideNumber = slides.length-1;
+			for (let i = 0; i < slideNumber; i++) {
+				cloneDot('afterbegin');
+				removeDot(position = 'lastChild');
+			} 
+			switchSlide(currentSlide);
+	} else if (slideNumber === slides.length-1 && direction === 'right') {
+			slideNumber = 0;
+			for (let i = 0; i < slides.length-1; i++) {
+				cloneDot('beforeend');
+				removeDot(position = 'firstChild');
+			}
+			switchSlide(currentSlide);
+	}
+	else {
+		if (direction === 'left') {
+			slideNumber--;
+			switchSlide(currentSlide);
+			cloneDot('beforeend');
+			removeDot(position = 'firstChild');
+		} else if (direction === 'right') {
+			slideNumber++;
+			switchSlide(currentSlide);
+			cloneDot('afterbegin');
+			removeDot(position = 'lastChild');
+		}	
+	}
+}
 
 let arrowLeft = document.querySelector(".arrow_left");
 arrowLeft.addEventListener("click", () => {
-	if (slideNumber === 0){
-		slideNumber = slides.length-1;
-		switchSlide(currentSlide);
-		for (let i = 0; i < slideNumber; i++) {
-			cloneDotPrev();
-		}
-		
-	} else {
-		slideNumber--;
-		switchSlide(currentSlide);
-		cloneDotNext();
-	}
+	switchComplete('left');
 });
 
 let arrowRight = document.querySelector(".arrow_right");
 arrowRight.addEventListener("click", () => {
-	console.log("Bouton droit");
-	if (slideNumber === slides.length-1){
-		slideNumber = 0;
-		switchSlide(currentSlide);
-		for (let i = 0; i < slides.length-1; i++) {
-			cloneDotNext();
-		}
-	} else {
-		slideNumber++;
-		switchSlide(currentSlide);
-		cloneDotPrev();
-	}
+	switchComplete ('right');
 });
 
